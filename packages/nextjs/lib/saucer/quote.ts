@@ -44,9 +44,14 @@ export async function readLiveQuote(client: PublicClient, amountTinybars: bigint
   const [reserve0, reserve1] = reserves;
   const [reserveIn, reserveOut] = hbarFirst ? [reserve0, reserve1] : [reserve1, reserve0];
   if (reserveIn <= 0n || reserveOut <= 0n) throw new Error("The pool has no usable reserves");
-  const idealOut = (amountTinybars * reserveOut) / reserveIn;
-  if (idealOut <= 0n) throw new Error("The pool quote is too small to assess");
-  const impact = idealOut > amounts[1] ? ((idealOut - amounts[1]) * 10_000n + idealOut - 1n) / idealOut : 0n;
+  const idealNumerator = amountTinybars * reserveOut;
+  if (idealNumerator < reserveIn) throw new Error("The pool quote is too small to assess");
+  const actualNumerator = amounts[1] * reserveIn;
+  // Keep the reserve ratio exact until the final upward bps rounding, including dust-sized quotes.
+  const impact =
+    idealNumerator > actualNumerator
+      ? ((idealNumerator - actualNumerator) * 10_000n + idealNumerator - 1n) / idealNumerator
+      : 0n;
 
   return {
     blockNumber,

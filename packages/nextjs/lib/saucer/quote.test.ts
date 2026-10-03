@@ -60,6 +60,11 @@ test("quote rounds impact upward so a fractional breach cannot pass the three-pe
   assert.equal(quote.priceImpactBps, 301);
 });
 
+test("quote preserves the fractional reserve ratio for dust-sized amounts", async () => {
+  const quote = await readLiveQuote(mockClient({ getAmountsOut: [1n, 1n], getReserves: [100n, 107n, 0] }), 1n);
+  assert.equal(quote.priceImpactBps, 655);
+});
+
 test("quote refuses unavailable or mismatched routing identities", async () => {
   for (const [overrides, message] of [
     [{ whbar: pair }, /WHBAR does not match/],

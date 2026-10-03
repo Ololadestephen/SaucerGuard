@@ -7,7 +7,7 @@ These are observed checks, not an independent security audit or a claim about fu
 | Suite | Result | Evidence boundary |
 | --- | --- | --- |
 | `yarn hardhat:test` | 18 passed | Local Solidity execution with a mock router; no HBAR spent |
-| `yarn workspace @sh/nextjs test` | 17 passed | Exact integer arithmetic, pinned quote reads, mirror/API failures |
+| `yarn workspace @sh/nextjs test` | 18 passed | Exact integer arithmetic, fractional reserve ratios, pinned quote reads, mirror/API failures |
 | `PLAYWRIGHT_BROWSER_CHANNEL=chrome yarn next:test:e2e` | 24 passed | Twelve scenarios on desktop and mobile; isolated fixture provider and intercepted RPC/mirror responses |
 | `yarn next:check-types` and `yarn hardhat:check-types` | Passed | TypeScript checks in both workspaces |
 | `yarn lint` | Passed | No ESLint warnings/errors; Next's inherited lint command emits a deprecation notice |
@@ -18,6 +18,8 @@ The contract suite checks valid execution, invalid immutable configuration, zero
 The browser suite checks reviewed calldata and wallet value, unknown association, wrong chain, quote expiry, deteriorated quote, wrong guard, signature rejection, reverted receipts, association success, non-success HTS codes, mirror indexing lag, and unavailable RPC. No browser test loads a private key or sends a real blockchain transaction. Fixture transaction hashes are only test values; the live application has no fixture fallback.
 
 The repository CI runs both unit suites, both type checks, lint, and the self-building browser suite. Failure traces are retained for seven days. The workflow needs read-only repository permissions and no wallet secret. Its configuration is committed; a local pass is not a claim that a hosted CI run has passed.
+
+The public hardening release `0d8bef6` was also recreated with the exact Scaffold-HBAR command: install, 59 behavior checks, both type checks, lint, production build, and core route checks passed in the isolated fresh project. Its [hosted CI run](https://github.com/Ololadestephen/SaucerGuard/actions/runs/37132791916) passed. The later reserve-ratio regression raises the local total to 60; this distinguishes that additional check from the earlier public run.
 
 ## External integration evidence
 

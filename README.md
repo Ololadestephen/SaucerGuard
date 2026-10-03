@@ -95,7 +95,7 @@ User + testnet wallet
 
 See [the implementation plan](docs/PLAN.md), [security notes](docs/SECURITY.md), and [testnet proof checklist](docs/TESTNET_PROOF.md).
 
-For a new builder: [how the pattern works and how to adapt it](docs/BUILDER_GUIDE.md) · [troubleshooting](docs/TROUBLESHOOTING.md) · [contract development and deployment](packages/hardhat/README.md) · [release validation: 59 behavior checks](docs/VALIDATION.md).
+For a new builder: [how the pattern works and how to adapt it](docs/BUILDER_GUIDE.md) · [troubleshooting](docs/TROUBLESHOOTING.md) · [contract development and deployment](packages/hardhat/README.md) · [release validation](docs/VALIDATION.md).
 
 ## Current proof status
 
