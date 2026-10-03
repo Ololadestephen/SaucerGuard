@@ -14,4 +14,4 @@ This is an educational testnet starter, not audited production swap infrastructu
 | Custody / key exposure | No private keys in the frontend or repository; wallet signs; guard does not receive the output token. |
 | External outage | Router, RPC, or mirror-node failures are surfaced and lock execution. No fixture fallback on live paths. |
 
-The main unproven boundary is the exact testnet deployment and swap. Local Hardhat tests mock the router; they do **not** prove Hedera precompile compatibility, HTS association, or an actual SaucerSwap fill. Complete the testnet proof gate before submitting or calling this chain-verified.
+One exact testnet deployment and guarded SaucerSwap fill are independently verified in [TESTNET_PROOF.md](TESTNET_PROOF.md). This does **not** audit the contract, guarantee another fill, prove every wallet integration, or replace the local mock-router boundary tests. Future quotes, association, pool depth, and gas must be rechecked for every attempted trade.

@@ -1,15 +1,27 @@
-# Testnet transaction proof
+# Hedera testnet proof
 
-Status: **PENDING — no deployment or swap transaction is claimed.**
+Status: **VERIFIED ON TESTNET** for one SAUCE association, one guard deployment, and one guarded HBAR→SAUCE swap on October 3, 2026. This proves those specific transactions, not future fills or frontend-wallet compatibility.
 
-Before submitting the bounty:
+## Public evidence
 
-1. Deploy `GuardedSaucerSwap` on Hedera testnet with a funded ECDSA-compatible account.
-2. Record the deployment EVM address and a public Hashscan or mirror-node deployment transaction link.
-3. Verify the guard's router, WHBAR, and outputToken immutable reads against the documented IDs.
-4. Associate testnet SAUCE `0.0.1183558` with the trading wallet and positively verify it through the mirror node.
-5. Sign one small, explicitly approved HBAR→SAUCE swap. Verify receipt status, emitted `GuardedSwapExecuted`, and wallet SAUCE balance change.
-6. Record the exact transaction link, input, minOut, actualOut, date/time, and network here. Do not record account keys.
-7. Clone from the **public** repository via the exact external-template CLI command and rerun install/lint/build/boot checks.
+| Step | Verified result | Public record |
+| --- | --- | --- |
+| Associate SAUCE | `TOKENASSOCIATE` `SUCCESS` for account `0.0.9831825` and token `0.0.1183558`; fee 0.49581858 HBAR | [Mirror transaction](https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.9831825-1791025630-384283418) |
+| Deploy guard | `SUCCESS`, contract `0.0.10841001`, EVM address `0xC18620A757AF927BC758Fe279b8C8Ba2340c260A`, 543,350 gas; fee 0.456414 HBAR | [Mirror result](https://testnet.mirrornode.hedera.com/api/v1/contracts/results/0x695c9b3b93b747d9bc9b7d49fde0301c6925d7f320057e082db883703ac28038) · [contract](https://testnet.mirrornode.hedera.com/api/v1/contracts/0.0.10841001) |
+| Execute guarded swap | `SUCCESS`, 0.1 HBAR input, 5.408280 SAUCE output, 166,585 gas; fee 0.13993140 HBAR | [Mirror result](https://testnet.mirrornode.hedera.com/api/v1/contracts/results/0x304233b8a960dd00c49e1393bdaf98031b6f53829679ecea52eb3e65fdc7f28a) |
 
-Do not substitute local Hardhat hashes, a router read-only quote, or a direct HBAR transfer for this proof.
+The deployment's immutable reads were checked on-chain: router `0.0.19264`, WHBAR `0.0.15058`, and SAUCE `0.0.1183558`. The deployed guard has no owner or withdrawal path.
+
+The swap's decoded `GuardedSwapExecuted` event records trader `0x8C0419295A7b467d8aD14E10418c4b15C00Bf6F7`, input `10,000,000` tinybars, reviewed and fresh output `5,408,280` SAUCE base units, minimum `5,354,197`, and actual output `5,408,280`. The mirror node independently showed the trader's SAUCE balance increase from zero to `5,408,280` base units. SAUCE has six decimals on testnet.
+
+The three transaction fees total **1.09216398 HBAR**; adding the 0.1-HBAR swap input gives a total wallet decrease of **1.19216398 testnet HBAR**. This was below the authorized **15 testnet-HBAR** total cap. No private key or wallet secret was copied into this repository or used in the frontend.
+
+## Reproduction boundary
+
+The read-only app and local tests remain runnable without a wallet. To try the existing public testnet guard, copy `packages/nextjs/.env.example` to `packages/nextjs/.env.local` and connect your own ECDSA testnet wallet after associating SAUCE. The configured guard address is public; its immutable identities are checked before the UI asks for a signature. To deploy your own guard, follow the README's encrypted-key Hardhat flow.
+
+The transactions above were signed by a local ECDSA testnet signer, **not by clicking the browser UI**. This is a verified contract/protocol integration proof, not a claim that every browser wallet or future pool state has been tested. Quotes, pool liquidity, gas prices, and token association can change; the app must fail closed when a prerequisite is unavailable.
+
+## Fresh public-template smoke test
+
+On October 3, 2026, the exact command `npm create scaffold-hbar@latest -- --template Ololadestephen/SaucerGuard` created a fresh testnet project from the public repository in an isolated temporary directory. Its dependency install, five Hardhat tests, eight frontend tests, type-check, lint, and production build all passed on Node 22. The production server returned HTTP 200 for `/`, `/debug`, and `/blockexplorer`; an invalid token-association request correctly returned HTTP 400. This smoke test used the public commit before this proof document was added; it did not sign another transaction.
