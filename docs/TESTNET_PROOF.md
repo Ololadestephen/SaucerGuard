@@ -20,7 +20,13 @@ The three transaction fees total **1.09216398 HBAR**; adding the 0.1-HBAR swap i
 
 The read-only app and local tests remain runnable without a wallet. To try the existing public testnet guard, copy `packages/nextjs/.env.example` to `packages/nextjs/.env.local` and connect your own ECDSA testnet wallet after associating SAUCE. The configured guard address is public; its immutable identities are checked before the UI asks for a signature. To deploy your own guard, follow the README's encrypted-key Hardhat flow.
 
-The transactions above were signed by a local ECDSA testnet signer, **not by clicking the browser UI**. This is a verified contract/protocol integration proof, not a claim that every browser wallet or future pool state has been tested. Quotes, pool liquidity, gas prices, and token association can change; the app must fail closed when a prerequisite is unavailable.
+The transactions above were signed by a local ECDSA testnet signer, **not by clicking the browser UI**. This is a verified contract/protocol integration proof, not a claim that every browser wallet or future pool state has been tested. The browser regression suite uses a fixture provider and intercepted network responses. The new HRC-719 association action is fixture-tested; the recorded real association used the native SDK path. Quotes, pool liquidity, gas prices, and token association can change; the app must fail closed when a prerequisite is unavailable.
+
+## Source verification and consistent quote reads
+
+On October 3, 2026, the repository's Sourcify v2 command returned `exact_match` for `GuardedSaucerSwap` at `0xC18620A757AF927BC758Fe279b8C8Ba2340c260A` on chain 296. See the [Sourcify contract record](https://sourcify.dev/server/v2/contract/296/0xC18620A757AF927BC758Fe279b8C8Ba2340c260A) and [Hashscan contract](https://hashscan.io/testnet/contract/0xC18620A757AF927BC758Fe279b8C8Ba2340c260A). This matches deployed bytecode to the source/compiler input; it is not a security audit. Source verification submitted no blockchain transaction and spent no HBAR.
+
+The updated read-only adapter was also checked against live testnet data: all router, factory, pair-token, and reserve calls were pinned to block `41303488` with timestamp `1791028870`. A one-HBAR input returned `54,082,039` SAUCE base units, with impact plus fee rounded up to 31 basis points. This is a historical observation, not a current price.
 
 ## Fresh public-template smoke test
 

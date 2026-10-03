@@ -28,6 +28,8 @@ export default function Home() {
     blockReason,
     getQuote,
     executeSwap,
+    associateSauce,
+    associationHash,
   } = useGuardedSaucerSwap();
 
   return (
@@ -53,6 +55,7 @@ export default function Home() {
                   value={amount}
                   onChange={event => updateAmount(event.target.value)}
                   aria-label="HBAR amount"
+                  disabled={loading}
                 />
                 <span className="mt-2 text-xs text-base-content/60">
                   On-chain cap: 10 HBAR. Eight decimal places maximum.
@@ -64,6 +67,7 @@ export default function Home() {
                 <select
                   className="select select-bordered w-full"
                   value={slippageBps}
+                  disabled={loading}
                   onChange={event => setSlippageBps(Number(event.target.value))}
                 >
                   <option value={50}>0.5%</option>
@@ -89,6 +93,8 @@ export default function Home() {
                     <dd className="text-right">
                       {quoteAge}s / {MAX_QUOTE_AGE_SECONDS}s
                     </dd>
+                    <dt>Observed block</dt>
+                    <dd className="text-right">{quote.blockNumber.toString()}</dd>
                   </dl>
                   <a
                     className="link link-primary mt-3 block break-all text-xs"
@@ -142,6 +148,9 @@ export default function Home() {
             address={address}
             associationError={associationError}
             refreshAssociation={refreshAssociation}
+            associateSauce={associateSauce}
+            associationHash={associationHash}
+            loading={loading}
           />
         </div>
       </div>

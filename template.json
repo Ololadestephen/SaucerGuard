@@ -30,7 +30,7 @@
               "url": "https://portal.hedera.com/faucet"
             },
             {
-              "text": "To enable signing, deploy GuardedSaucerSwap on testnet, set NEXT_PUBLIC_GUARD_ADDRESS in packages/nextjs/.env.local, and associate testnet SAUCE. See README.md."
+              "text": "Copy packages/nextjs/.env.example to packages/nextjs/.env.local to use the public testnet guard. Connect a funded ECDSA testnet wallet; the app can request SAUCE association before a guarded swap. To deploy your own guard, follow README.md."
             }
           ]
         }

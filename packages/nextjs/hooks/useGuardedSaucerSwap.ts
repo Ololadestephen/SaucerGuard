@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSauceAssociation } from "./useSauceAssociation";
-import { type Address, isAddress, isAddressEqual, parseEther } from "viem";
+import { type Address, isAddress, isAddressEqual } from "viem";
 import { useAccount, usePublicClient, useWriteContract } from "wagmi";
-import { guardedSwapAbi } from "~~/lib/saucer/abi";
+import { guardedSwapAbi, htsAssociationAbi } from "~~/lib/saucer/abi";
 import {
   MAX_PRICE_IMPACT_BPS,
   MAX_QUOTE_AGE_SECONDS,
@@ -11,7 +11,14 @@ import {
   TESTNET_CHAIN_ID,
   WHBAR_ADDRESS,
 } from "~~/lib/saucer/config";
-import { type SwapQuote, guardReason, minimumOutput, parseHbarInput, quoteDrifted } from "~~/lib/saucer/guard";
+import {
+  type SwapQuote,
+  guardReason,
+  minimumOutput,
+  parseHbarInput,
+  quoteDrifted,
+  tinybarsToWeibars,
+} from "~~/lib/saucer/guard";
 import { readLiveQuote } from "~~/lib/saucer/quote";
 
 const configuredGuard = process.env.NEXT_PUBLIC_GUARD_ADDRESS;
@@ -28,6 +35,7 @@ export function useGuardedSaucerSwap() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [txHash, setTxHash] = useState<`0x${string}` | null>(null);
+  const [associationHash, setAssociationHash] = useState<`0x${string}` | null>(null);
   const [nowSeconds, setNowSeconds] = useState(() => Math.floor(Date.now() / 1000));
 
   useEffect(() => {
@@ -108,7 +116,7 @@ export function useGuardedSaucerSwap() {
         abi: guardedSwapAbi,
         functionName: "execute",
         args: [quote.outputRaw, minimumRaw, BigInt(quote.quotedAt), BigInt(quote.quotedAt + 120)],
-        value: parseEther(amount),
+        value: tinybarsToWeibars(quote.amountTinybars),
         gas: 1_500_000n,
       });
       const receipt = await publicClient.waitForTransactionReceipt({ hash, confirmations: 1 });
@@ -117,6 +125,34 @@ export function useGuardedSaucerSwap() {
       setQuote(null);
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Transaction failed");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function associateSauce() {
+    setError("");
+    if (!publicClient || !address || chainId !== TESTNET_CHAIN_ID || associated !== false) {
+      setError("Connect on Hedera testnet and verify the missing SAUCE association first.");
+      return;
+    }
+    setLoading(true);
+    setAssociationHash(null);
+    try {
+      const { result, request } = await publicClient.simulateContract({
+        account: address,
+        address: SAUCE_ADDRESS,
+        abi: htsAssociationAbi,
+        functionName: "associate",
+      });
+      if (result !== 22n) throw new Error(`HTS association refused with response code ${result}`);
+      const hash = await writeContractAsync({ ...request, chainId: TESTNET_CHAIN_ID });
+      const receipt = await publicClient.waitForTransactionReceipt({ hash, confirmations: 1 });
+      if (receipt.status !== "success") throw new Error("The token association transaction reverted.");
+      setAssociationHash(hash);
+      refreshAssociation();
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Token association failed");
     } finally {
       setLoading(false);
     }
@@ -144,5 +180,7 @@ export function useGuardedSaucerSwap() {
     blockReason,
     getQuote,
     executeSwap,
+    associateSauce,
+    associationHash,
   };
 }

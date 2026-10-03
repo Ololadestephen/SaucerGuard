@@ -1,14 +1,15 @@
 import { MAX_INPUT_TINYBARS } from "./config";
-import { type SwapQuote, guardReason, minimumOutput, parseHbarInput, quoteDrifted } from "./guard";
+import { type SwapQuote, guardReason, minimumOutput, parseHbarInput, quoteDrifted, tinybarsToWeibars } from "./guard";
 import assert from "node:assert/strict";
 import test from "node:test";
 
 const quote: SwapQuote = {
+  blockNumber: 42n,
   amountTinybars: 100_000_000n,
   outputRaw: 54_000_000n,
   quotedAt: 1_000,
   priceImpactBps: 35,
-  pair: "0x1234",
+  pair: "0x0000000000000000000000000000000000001234",
 };
 
 test("HBAR input is exact and capped at ten HBAR", () => {
@@ -17,6 +18,13 @@ test("HBAR input is exact and capped at ten HBAR", () => {
   for (const amount of ["0", "10.00000001", "1.000000001", "-1", "1e3", "abc"]) {
     assert.throws(() => parseHbarInput(amount));
   }
+});
+
+test("wallet value conversion preserves the Hedera tinybar/weibar boundary exactly", () => {
+  assert.equal(tinybarsToWeibars(parseHbarInput("0.00000001")), 10_000_000_000n);
+  assert.equal(tinybarsToWeibars(parseHbarInput("0.1")), 100_000_000_000_000_000n);
+  assert.equal(tinybarsToWeibars(parseHbarInput("10")), 10_000_000_000_000_000_000n);
+  for (const amount of [0n, -1n, MAX_INPUT_TINYBARS + 1n]) assert.throws(() => tinybarsToWeibars(amount));
 });
 
 test("minimum output uses integer basis points", () => {
@@ -47,4 +55,8 @@ test("execution fails closed on stale quote, wrong chain, missing association, a
   assert.match(guardReason({ ...base, guardConfigured: false }) ?? "", /deploy/i);
   assert.match(guardReason({ ...base, quote: { ...quote, priceImpactBps: 301 } }) ?? "", /impact/i);
   assert.match(guardReason({ ...base, inputTinybars: 200n }) ?? "", /fresh quote/i);
+  assert.equal(guardReason({ ...base, nowSeconds: 1_030, quote: { ...quote, priceImpactBps: 300 } }), null);
+  assert.match(guardReason({ ...base, nowSeconds: 999 }) ?? "", /expired/i);
+  assert.match(guardReason({ ...base, connected: false }) ?? "", /connect/i);
+  assert.match(guardReason({ ...base, associated: false }) ?? "", /associate/i);
 });

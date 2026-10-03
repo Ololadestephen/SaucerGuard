@@ -20,10 +20,15 @@ export async function GET(request: NextRequest) {
     if (typeof body !== "object" || body === null || !("tokens" in body) || !Array.isArray(body.tokens)) {
       throw new Error("Unexpected mirror-node response");
     }
-    const associated = body.tokens.some(
-      (token: unknown) =>
-        typeof token === "object" && token !== null && "token_id" in token && token.token_id === SAUCE_ID,
-    );
+    if (
+      body.tokens.some(
+        (token: unknown) =>
+          typeof token !== "object" || token === null || !("token_id" in token) || typeof token.token_id !== "string",
+      )
+    ) {
+      throw new Error("Unexpected token association record");
+    }
+    const associated = body.tokens.some((token: { token_id: string }) => token.token_id === SAUCE_ID);
     return NextResponse.json({ associated, tokenId: SAUCE_ID });
   } catch {
     return NextResponse.json({ error: "Token association could not be verified" }, { status: 502 });

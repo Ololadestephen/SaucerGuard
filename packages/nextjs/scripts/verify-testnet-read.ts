@@ -14,6 +14,7 @@ async function main() {
         network: "hederaTestnet",
         source: "SaucerSwap V1 router + factory + pair",
         amountTinybars: quote.amountTinybars.toString(),
+        blockNumber: quote.blockNumber.toString(),
         outputRaw: quote.outputRaw.toString(),
         quotedAt: quote.quotedAt,
         pair: quote.pair,

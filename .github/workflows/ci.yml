@@ -4,6 +4,9 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   verify:
     runs-on: ubuntu-latest
@@ -16,5 +19,14 @@ jobs:
       - run: yarn install --immutable
       - run: yarn hardhat:test
       - run: yarn workspace @sh/nextjs test
+      - run: yarn hardhat:check-types
+      - run: yarn next:check-types
       - run: yarn lint
-      - run: yarn next:build
+      - run: yarn workspace @sh/nextjs playwright install --with-deps chromium
+      - run: yarn next:test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: browser-failure-evidence
+          path: packages/nextjs/test-results/
+          retention-days: 7

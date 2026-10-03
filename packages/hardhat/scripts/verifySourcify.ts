@@ -5,8 +5,7 @@ import * as path from "path";
  * Verifies a deployed contract on Sourcify (API v2) — the Hedera-supported verifier.
  *
  * Usage:
- *   yarn verify:contract -- HederaToken testnet [0xAddress]
- *   yarn verify:contract -- HederaToken mainnet [0xAddress]
+ *   yarn verify:contract -- GuardedSaucerSwap testnet [0xAddress]
  * If the address is omitted, it is read from deployments/<network>/<Contract>.json.
  */
 
@@ -103,7 +102,7 @@ export async function verifyOnSourcify(
 }
 
 async function main() {
-  const [contractName, networkArg, addressArg] = process.argv.slice(2);
+  const [contractName, networkArg, addressArg] = process.argv.slice(2).filter(argument => argument !== "--");
   const network = NETWORKS[networkArg ?? ""];
   if (!contractName || !network) {
     console.error(`Usage: yarn verify:contract -- <ContractName> <testnet|mainnet> [0xAddress]`);

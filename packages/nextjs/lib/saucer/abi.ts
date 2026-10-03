@@ -10,8 +10,11 @@ export const saucerFactoryAbi = parseAbi(["function getPair(address tokenA,addre
 
 export const saucerPairAbi = parseAbi([
   "function token0() view returns (address)",
+  "function token1() view returns (address)",
   "function getReserves() view returns (uint112 reserve0,uint112 reserve1,uint32 blockTimestampLast)",
 ]);
+
+export const htsAssociationAbi = parseAbi(["function associate() returns (int64 responseCode)"]);
 
 export const guardedSwapAbi = parseAbi([
   "function router() view returns (address)",

@@ -27,3 +27,5 @@ dist
 !.env.example
 .desloppify/
 scorecard.png
+playwright-report/
+test-results/

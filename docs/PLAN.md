@@ -10,7 +10,7 @@ The first supported route is fixed: native testnet HBAR → testnet SAUCE throug
 
 1. Enter an amount. The parser rejects zero, scientific notation, more than eight HBAR decimals, and values over 10 HBAR.
 2. Read the current router quote and actual pool reserves. Show quoted output, slippage floor, approximate price impact plus fee, pair identity, and age.
-3. Connect a chain-296 wallet. Confirm testnet SAUCE association from the mirror node. Fail closed on errors.
+3. Connect a chain-296 wallet. Confirm testnet SAUCE association from the mirror node. If the association is absent, simulate and request a wallet-signed HRC-719 `associate()` call on the fixed SAUCE facade. Recheck the mirror node after confirmation; fail closed while its result is unknown.
 4. On click, confirm the deployed guard identity and re-read the quote. Refuse if it deteriorated over 1% or crosses the 3% price-impact policy.
 5. The wallet signs a payable call to the guard. The contract itself rechecks amount, quote age, quote deterioration, slippage floor, route and deadline, then forwards to SaucerSwap with the user's address as recipient.
 6. Surface the transaction hash and mirror-node proof. Never report success on a reverted receipt.
@@ -40,4 +40,5 @@ The frontend quote is an ephemeral observation, not a promise. Its core fields a
 - A 30-second quote limit may be tight for a slow wallet. That is an intentional safety tradeoff; users can refresh.
 - Pool reserve impact is an approximate baseline including the V1 fee, not execution slippage or an oracle price.
 - This starter does not support mainnet, V2/V3 routing, token→token, token approvals, aggregator search, price oracles, batching, automated trading, or orderbook fills.
-- No testnet proof has been claimed yet. This is the remaining mandatory external gate.
+- Association, guard deployment, and a 0.1-HBAR guarded swap are verified in [TESTNET_PROOF.md](TESTNET_PROOF.md). These transactions used a local ECDSA signer. The browser test suite uses isolated wallet/RPC fixtures; its hashes and responses are not historical chain evidence.
+- The newly added HRC-719 browser association action has fixture coverage. The recorded real association used a native SDK transaction; it does not establish a live HRC-719 browser call.

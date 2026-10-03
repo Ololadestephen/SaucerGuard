@@ -9,6 +9,9 @@ type Props = {
   address: string | undefined;
   associationError: string;
   refreshAssociation: () => void;
+  associateSauce: () => Promise<void>;
+  associationHash: `0x${string}` | null;
+  loading: boolean;
 };
 
 export function GuardPreflightPanel({
@@ -19,6 +22,9 @@ export function GuardPreflightPanel({
   address,
   associationError,
   refreshAssociation,
+  associateSauce,
+  associationHash,
+  loading,
 }: Props) {
   return (
     <aside className="space-y-5">
@@ -44,9 +50,35 @@ export function GuardPreflightPanel({
               <strong>{quote ? `${(quote.priceImpactBps / 100).toFixed(2)}% / 3% cap` : "awaiting quote"}</strong>
             </li>
           </ul>
-          <button className="btn btn-sm btn-outline mt-3" onClick={() => void refreshAssociation()} disabled={!address}>
+          {associated === false && (
+            <button
+              className="btn btn-sm btn-primary mt-3"
+              onClick={() => void associateSauce()}
+              disabled={loading || !address || chainId !== TESTNET_CHAIN_ID}
+            >
+              Associate SAUCE with your wallet
+            </button>
+          )}
+          <button
+            className="btn btn-sm btn-outline mt-3"
+            onClick={() => void refreshAssociation()}
+            disabled={loading || !address}
+          >
             Recheck token association
           </button>
+          {associationHash && (
+            <p role="status" className="mt-2 text-xs">
+              Association transaction confirmed. Recheck if the mirror node is still indexing it.{" "}
+              <a
+                className="link link-primary"
+                href={`https://testnet.mirrornode.hedera.com/api/v1/contracts/results/${associationHash}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                View association proof
+              </a>
+            </p>
+          )}
           {associationError && <p className="mt-2 text-xs text-warning">{associationError}</p>}
           <a
             className="link link-primary mt-2 text-xs"

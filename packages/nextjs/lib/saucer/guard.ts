@@ -9,12 +9,20 @@ import {
 import { parseUnits } from "viem";
 
 export type SwapQuote = {
+  blockNumber: bigint;
   amountTinybars: bigint;
   outputRaw: bigint;
   quotedAt: number;
   priceImpactBps: number;
   pair: `0x${string}`;
 };
+
+export function tinybarsToWeibars(amountTinybars: bigint): bigint {
+  if (amountTinybars <= 0n || amountTinybars > MAX_INPUT_TINYBARS) {
+    throw new Error("Amount must be greater than zero and no more than 10 HBAR");
+  }
+  return amountTinybars * 10_000_000_000n;
+}
 
 export function parseHbarInput(raw: string): bigint {
   if (!/^(?:0|[1-9]\d*)(?:\.\d{1,8})?$/.test(raw)) {

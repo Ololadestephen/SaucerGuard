@@ -10,7 +10,8 @@
     "lint": "next lint",
     "serve": "next start",
     "start": "next dev",
-    "test": "node --import tsx --test lib/saucer/*.test.ts",
+    "test": "node --import tsx --test lib/saucer/*.test.ts app/api/token-association/*.test.ts",
+    "test:e2e": "playwright test",
     "verify:testnet-read": "node --import tsx scripts/verify-testnet-read.ts"
   },
   "dependencies": {
@@ -38,6 +39,7 @@
     "zustand": "^5.0.0"
   },
   "devDependencies": {
+    "@playwright/test": "1.62.1",
     "@tailwindcss/postcss": "latest",
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
     "@types/node": "^18.19.50",
