@@ -1,0 +1,40 @@
+{
+  "name": "guarded-saucer-swap",
+  "description": "A Hedera testnet HBAR-to-SAUCE starter with live SaucerSwap V1 quotes, HTS association checks, and on-chain swap policy.",
+  "create-scaffold-hbar": {
+    "capabilities": {
+      "frontend": ["nextjs-app"],
+      "solidityFramework": ["hardhat"],
+      "packageManager": ["yarn"]
+    },
+    "defaults": {
+      "frontend": "nextjs-app",
+      "solidityFramework": "hardhat",
+      "packageManager": "yarn"
+    },
+    "outro": {
+      "sections": [
+        {
+          "title": "Run the guarded swap starter",
+          "steps": [
+            {
+              "label": "Install and test",
+              "command": "{run:hardhat:test}"
+            },
+            {
+              "label": "Start the read-only quote app",
+              "command": "{run:next:dev}"
+            },
+            {
+              "label": "Fund a Hedera testnet wallet before deployment",
+              "url": "https://portal.hedera.com/faucet"
+            },
+            {
+              "text": "To enable signing, deploy GuardedSaucerSwap on testnet, set NEXT_PUBLIC_GUARD_ADDRESS in packages/nextjs/.env.local, and associate testnet SAUCE. See README.md."
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
